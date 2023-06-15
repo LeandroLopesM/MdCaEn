@@ -22,10 +22,10 @@ todo:
 
 
 int save(int* key1, char* into) {
-	FILE* out = fopen("out.txt", "w, ccs=UTF-8");
-	char choice2;
+	FILE* out = fopen("out.txt", "w");
+	char choice2 = 'N'; 
 	printf("\n\nDeseja salvar para arquivo? Y/N\n> ");
-	scanf("%c", &choice2);
+	scanf(" %c", &choice2);
 	getchar();
 	if (choice2 == 'Y' || choice2 == 'y') {
 		fprintf(out, "Chave:  ");
@@ -45,12 +45,13 @@ int save(int* key1, char* into) {
 	else printf("Algo deu errado"); exit(1);
 }
 
+
+
 /*int asciiflag(char* x){
 	char unicodein[150] = {0};
 	int i;
 	memcpy(unicodein, x, sizeof(unicodein));
 }*/
-
 
 void crypt(char* rawin) {
 	//intialize vars
@@ -59,6 +60,8 @@ void crypt(char* rawin) {
 	int keysave[150] = { 0 };
 	//copy raw value to new var
 	memcpy(encrypted, rawin, strlen(rawin));
+
+	encrypted[strlen(encrypted) - 1] = '\0';
 	//encrypt
 	for (int i = 0; i < strlen(encrypted); i++) {
 		//startup keygen
@@ -79,6 +82,7 @@ void crypt(char* rawin) {
 	}
 
 	save(keysave, encrypted);
+	exit(0);
 }
 
 void decrypt(char* decrin, char* decrinner) {
