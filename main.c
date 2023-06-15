@@ -22,7 +22,7 @@ todo:
 
 
 int save(int* key1, char* into) {
-	FILE* out = fopen("out.txt", "w");
+	FILE* out = fopen("out.txt", "w, ccs=UTF-8");
 	char choice2;
 	printf("\n\nDeseja salvar para arquivo? Y/N\n> ");
 	scanf("%c", &choice2);
@@ -47,7 +47,8 @@ int save(int* key1, char* into) {
 
 /*int asciiflag(char* x){
 	char unicodein[150] = {0};
-	memcpy(uncodein, x, sizeof(unicodein));
+	int i;
+	memcpy(unicodein, x, sizeof(unicodein));
 }*/
 
 
@@ -61,14 +62,14 @@ void crypt(char* rawin) {
 	//encrypt
 	for (int i = 0; i < strlen(encrypted); i++) {
 		//startup keygen
-		keygen = rand() % 5 + 1;
+		keygen = rand() % 5;
 		//encrypt
 		encrypted[i] = encrypted[i] + keygen;
 		//save current key to arr
 		keysave[i] = keygen;
 		klen++;
 	}
-//	asciiflag(encrypted);
+	//asciiflag(encrypted);
 	//output
 	printf("Mensagem criptografada:  %s", encrypted);
 	printf("\nChave de criptografia:  ");
