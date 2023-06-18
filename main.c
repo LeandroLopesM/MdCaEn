@@ -1,150 +1,123 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <time.h>
-#include <Windows.h>
+#include <string.h>
 
-/******************************
+void save(char* message, int* key){
+	FILE *out = fopen("out.txt", "w");
+	char saveor = 'p';
 
-		MODIFIED CAESAR 
-          CYPHER
-Por KKrainer
-********************************
-todo:
-	- We done
-*/
-
-/*int E(int num, int max, int min){
-	if(num >= min && num <= max) return 1;
-	return 0;
-}*/
-
-
-int save(int* key1, char* into) {
-	FILE* out = fopen("out.txt", "w");
-	char choice2 = 'N'; 
-	printf("\n\nDeseja salvar para arquivo? Y/N\n> ");
-	scanf(" %c", &choice2);
+	printf("\nWould you like to save? [Y/N]\n>");
+	scanf("%c", &saveor);
 	getchar();
-	if (choice2 == 'Y' || choice2 == 'y') {
-		fprintf(out, "Chave:  ");
-		for (int y = 0; y < sizeof(key1); y++) {
-			fprintf(out, "%d", key1[y]);
+
+	if(saveor == 'y' || saveor == 'Y'){
+
+		fprintf(out, "\nMensagem:  %s", message);
+		fprintf(out, "\nChave:  ");
+
+		for (int y = 0; y < (int)sizeof(key); y++) {
+			fprintf(out, "%d", key[y]);
 		}
-		fprintf(out, "\nMensagem:  %s", into);
-		printf("Salvo");
-		getchar();
+
+		printf("Saved");
 		fclose(out);
+
+		getchar();
+
 		exit(0);
-	}
-	else if (choice2 == 'N') {
-		printf("Saindo...");
+	} else if(saveor == 'n' || saveor == 'N'){
+		printf("Exiting...");
 		exit(0);
+	} else{
+		printf("Algo went errado");
+		exit(1);
 	}
-	else printf("Algo deu errado"); exit(1);
 }
 
+int numPlaces (int n) {
+    if (n < 10) return 1;
+    if (n < 100) return 2;
+    if (n < 1000) return 3;
+    if (n < 10000) return 4;
+    if (n < 100000) return 5;
+    if (n < 1000000) return 6;
+    if (n < 10000000) return 7;
+    if (n < 100000000) return 8;
+    if (n < 1000000000) return 9;
+	return 0;
+}
 
+void strtoarr(int number, int* array, int numDigits) {
+    int temp = number;
+    int divisor = 1;
 
-/*int asciiflag(char* x){
-	char unicodein[150] = {0};
-	int i;
-	memcpy(unicodein, x, sizeof(unicodein));
-}*/
+    for (int i = 0; i < numDigits - 1; i++) {
+        divisor *= 10;
+    }
+    
+    for (int i = 0; i < numDigits; i++) {
+        array[i] = temp / divisor;  
+        temp = temp % divisor; 
+        divisor = divisor / 10;
+    }
+}
 
-void crypt(char* rawin) {
-	//intialize vars
-	char encrypted[150] = { 0 };
-	int keygen, klen = 0;
-	int keysave[150] = { 0 };
-	//copy raw value to new var
-	memcpy(encrypted, rawin, strlen(rawin));
+int keygen(int max){
+	int key = rand() % max + 1;
+	return key;
+}
 
-	encrypted[strlen(encrypted) - 1] = '\0';
-	//encrypt
-	for (int i = 0; i < strlen(encrypted); i++) {
-		//startup keygen
-		keygen = rand() % 5;
-		//encrypt
-		encrypted[i] = encrypted[i] + keygen;
-		//save current key to arr
-		keysave[i] = keygen;
-		klen++;
+void encrypt(char* rawmsg){
+	int key = 0, keyleng = 0, keyarr[50] = {0};
+
+	for(int i = 0; i < (int)strlen(rawmsg); i++, keyleng++){
+		key = keygen(10);
+
+		rawmsg[i] = rawmsg[i] + key;
+
+		keyarr[i] = key;
 	}
-	//asciiflag(encrypted);
-	//output
-	printf("Mensagem criptografada:  %s", encrypted);
-	printf("\nChave de criptografia:  ");
-	//print keysave
-	for (int arr = 0; arr < klen; arr++) {
-		printf("%d", keysave[arr]);
-	}
-
-	save(keysave, encrypted);
+	printf("Message:  %s\n", rawmsg);
+	printf("Key:  ");
+	for(int i = 0; i < keyleng; i++){printf("%d", keyarr[i]);}
+	save(rawmsg, keyarr);
 	exit(0);
 }
 
-void decrypt(char* decrin, char* decrinner) {
-	char decrypt[150] = { 0 };
-	char keyinput[150] = { 0 };
-	int arrayed[150] = { 0 };
-
-	//copy string var
-	memcpy(keyinput, decrin, strlen(decrin));
-	memcpy(decrypt, decrinner, strlen(decrinner));
-
-	//str to array
-	for(int c; c < strlen(keyinput); c++){
-		arrayed[c] = keyinput[c];
+void decrypt(int* key, char* encrin){
+	for(int i = 0; i < (int)strlen(encrin); i++){
+		encrin[i] = encrin[i] - key[i];
 	}
-
-	//decrypt
-	for (int j = 0; j < strlen(decrypt); j++) {
-		decrypt[j] = decrypt[j] - arrayed[j];
-	}
-	printf("\nMensagem descriptografada:  %s", decrypt);
+	printf("Decripted:  %s\n", encrin);
 }
 
 int main(void){
-	//start keygen
-	srand((unsigned)time(NULL));
+	srand(time(NULL));
 
-	//Prompt choice
-	int choicemain = 0;
-	char raw[150] = "";
-	char buff[150] = "";
-	printf("1 - Criptografar\n2 - Decriptografar\n> ");
-	scanf("%d", &choicemain);
+	int userchoice = 0, keyarr[100], keyin = 0, intlen = 0;
+	char userin[50] = "";
+
+	printf("1 - Encrypt\n2 - Decrypt\n> ");
+	scanf("%d", &userchoice);
 	getchar();
 
-
-	if (choicemain == 1) {
-		//prompt for encrypt
-		printf("\nDigite a mensagem a ser criptografada\n> ");
-		fgets(raw, 150, stdin);
-		crypt(raw);
+	if(userchoice == 1){
+		printf("Message\n> ");
+		fgets(userin, 50, stdin);
+		encrypt(userin);
 	}
-	else if (choicemain == 2) {
-		//prompt for decrypt
-		printf("\nEncrypted message\n> ");
-		fgets(raw, 150, stdin);
+	else if(userchoice == 2){
+		printf("Mesage\n> ");
+		fgets(userin, 50, stdin);
+		printf("Key\n> ");
+		scanf("%d", &keyin);
+		intlen = numPlaces(keyin);
+		strtoarr(keyin, keyarr, intlen);
 
-		printf("\nDecryption Key\n> ");
-		fgets(buff, 150, stdin);
+		decrypt(keyarr, userin);
 
-
-		//string to array
-		//size_t slen = strlen(buff) - 1;
-		//int arr[150];
-		/*for (size_t i = 0; i < slen; i++) {
-			arr[i] = buff[i] - '0';
-		}*/
-
-		decrypt(buff, raw);
-	}
-	else {
-		printf("Algo deu errado");
-		return 1;
+		exit(2);
 	}
 }
