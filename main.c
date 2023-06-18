@@ -4,6 +4,14 @@
 #include <time.h>
 #include <string.h>
 
+/*****************************
+
+	MODIFIED CAESAR CYPHER
+	       18/06/2023
+
+Kkrainer
+*****************************/
+
 void save(char* message, int* key){
 	FILE *out = fopen("out.txt", "w");
 	char saveor = 'p';
@@ -29,9 +37,11 @@ void save(char* message, int* key){
 		exit(0);
 	} else if(saveor == 'n' || saveor == 'N'){
 		printf("Exiting...");
+		fclose(out);
 		exit(0);
 	} else{
 		printf("Algo went errado");
+		fclose(out);
 		exit(1);
 	}
 }
